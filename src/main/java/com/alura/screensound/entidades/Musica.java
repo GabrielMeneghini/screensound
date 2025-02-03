@@ -33,4 +33,13 @@ public class Musica {
     public Artista getArtista() {
         return artista;
     }
+
+    // Methods ---------------------------------------------------------------------------------------------------------
+    @Override
+    public String toString() {
+        return "Musica{" +
+                "nome='" + nome + "'" +
+                ", artista='" + artista.getNome() + "'}";
+    }
+
 }

@@ -46,4 +46,14 @@ public class Artista {
     public void setMusicas(List<Musica> musicas) {
         this.musicas = musicas;
     }
+
+    // Methods ---------------------------------------------------------------------------------------------------------
+    @Override
+    public String toString() {
+        return "Artista{" +
+                "nome='" + nome + '\'' +
+                ", tipoDoArtista=" + tipoDoArtista +
+                '}';
+    }
+
 }
