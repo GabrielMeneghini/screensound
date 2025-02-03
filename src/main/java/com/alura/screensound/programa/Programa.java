@@ -1,11 +1,25 @@
 package com.alura.screensound.programa;
 
+import com.alura.screensound.entidades.Artista;
+import com.alura.screensound.entidades.TipoDoArtista;
+import com.alura.screensound.repository.ArtistaRepository;
+import com.alura.screensound.repository.MusicaRepository;
+
 import java.util.Scanner;
 
 public class Programa {
 
-    Scanner sc = new Scanner(System.in);
+    private Scanner sc = new Scanner(System.in);
+    private ArtistaRepository artistaRepository;
+    private MusicaRepository musicaRepository;
 
+    // Constructors ----------------------------------------------------------------------------------------------------
+    public Programa(ArtistaRepository artistaRepository, MusicaRepository musicaRepository) {
+        this.artistaRepository = artistaRepository;
+        this.musicaRepository = musicaRepository;
+    }
+
+    // Methods ---------------------------------------------------------------------------------------------------------
     public void iniciarPrograma() {
         int opcao = -1;
         while (opcao != 0) {
@@ -20,10 +34,10 @@ public class Programa {
                     
                     0- Sair
                     """);
-            opcao = sc.nextInt();
+            opcao = sc.nextInt(); sc.nextLine();
             switch (opcao) {
                 case 1:
-
+                    cadastrarArtistas();
                     break;
                 case 2:
 
@@ -44,5 +58,35 @@ public class Programa {
                     System.out.println("Opção inválida.");
             }
         }
+    }
+
+    private void cadastrarArtistas() {
+        System.out.println("Qual é o nome do artista?");
+        String nomeArtista = sc.nextLine();
+
+        System.out.println("""
+                Qual é o tipo do artista? Escolha uma das opções abaixo:
+                1- Solo
+                2- Dupla
+                3- Banda
+                """);
+        int opcaoTipoArtista = sc.nextInt(); sc.nextLine();
+        TipoDoArtista tipoDoArtista = null;
+        switch (opcaoTipoArtista) {
+            case 1:
+                tipoDoArtista = TipoDoArtista.SOLO;
+                break;
+            case 2:
+                tipoDoArtista = TipoDoArtista.DUPLA;
+                break;
+            case 3:
+                tipoDoArtista = TipoDoArtista.BANDA;
+                break;
+            default:
+                System.out.println("Opção inválida");
+        }
+
+        artistaRepository.save(new Artista(nomeArtista, tipoDoArtista));
+        System.out.println("Artista cadastrado com sucesso.\n");
     }
 }

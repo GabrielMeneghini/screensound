@@ -15,11 +15,19 @@ public class Artista {
     @Column(nullable = false, unique = true)
     private String nome;
 
-    @Transient
+    @Enumerated(EnumType.STRING)
+    private TipoDoArtista tipoDoArtista;
+
+    @OneToMany(mappedBy = "artista")
     private List<Musica> musicas;
 
     // Constructors ----------------------------------------------------------------------------------------------------
     public Artista() {}
+
+    public Artista(String nome, TipoDoArtista tipoDoArtista) {
+        this.nome = nome;
+        this.tipoDoArtista = tipoDoArtista;
+    }
 
     public Artista(String nome, List<Musica> musicas) {
         this.nome = nome;
@@ -33,5 +41,9 @@ public class Artista {
 
     public List<Musica> getMusicas() {
         return musicas;
+    }
+
+    public void setMusicas(List<Musica> musicas) {
+        this.musicas = musicas;
     }
 }

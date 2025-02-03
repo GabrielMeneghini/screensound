@@ -13,28 +13,21 @@ public class Musica {
     @Column(nullable = false, unique = true)
     private String nome;
 
-    @Enumerated(EnumType.STRING)
-    private TipoDoArtista tipoDoArtista;
-
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "artista_id")
     private Artista artista;
 
     // Constructors ----------------------------------------------------------------------------------------------------
     public Musica() {}
 
-    public Musica(String nome, TipoDoArtista tipoDoArtista, Artista artista) {
+    public Musica(String nome, Artista artista) {
         this.nome = nome;
-        this.tipoDoArtista = tipoDoArtista;
         this.artista = artista;
     }
 
     // Getters and Setters ---------------------------------------------------------------------------------------------
     public String getNome() {
         return nome;
-    }
-
-    public TipoDoArtista getTipoDoArtista() {
-        return tipoDoArtista;
     }
 
     public Artista getArtista() {
