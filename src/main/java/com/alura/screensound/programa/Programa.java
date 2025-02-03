@@ -48,7 +48,7 @@ public class Programa {
                     listarMusicas();
                     break;
                 case 4:
-
+                    buscarMusicasPorArtista();
                     break;
                 case 5:
 
@@ -60,6 +60,16 @@ public class Programa {
                     System.out.println("Opção inválida.");
             }
         }
+    }
+
+    private void buscarMusicasPorArtista() {
+        System.out.println("Escolha um artista dentre os já cadastrados para ver todas as suas músicas:");
+        listarArtistas();
+
+        Artista artista = buscarArtista();
+
+        List<Musica> musicaList = musicaRepository.findByArtistaNomeIgnoreCase(artista.getNome());
+        musicaList.forEach(System.out::println);
     }
 
     private void cadastrarArtistas() {
@@ -96,9 +106,7 @@ public class Programa {
         System.out.println("Escolha um artista dentre os já cadastrados para adicionar músicas:");
         listarArtistas();
 
-        System.out.print("\nEscreva o nome do artista escolhido: ");
-        String nomeArtista = sc.nextLine();
-        Artista artista = artistaRepository.findByNomeContainingIgnoreCase(nomeArtista);
+        Artista artista = buscarArtista();
 
         System.out.println("\nQual o nome da música que você quer adicionar para " + artista.getNome() + "?");
         String nomeMusica = sc.nextLine();
@@ -117,4 +125,9 @@ public class Programa {
         musicaList.forEach(System.out::println);
     }
 
+    private Artista buscarArtista() {
+        System.out.print("\nEscreva o nome do artista escolhido: ");
+        String nomeArtista = sc.nextLine();
+        return artistaRepository.findByNomeContainingIgnoreCase(nomeArtista);
+    }
 }
