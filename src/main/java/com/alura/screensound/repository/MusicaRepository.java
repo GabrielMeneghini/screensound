@@ -9,4 +9,5 @@ public interface MusicaRepository extends JpaRepository<Musica, Long> {
 
     List<Musica> findByArtistaNomeIgnoreCase(String nome);
 
+    List<Musica> OrderByArtistaNome();
 }

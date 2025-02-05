@@ -7,6 +7,7 @@ import com.alura.screensound.repository.ArtistaRepository;
 import com.alura.screensound.repository.MusicaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Programa {
@@ -26,13 +27,12 @@ public class Programa {
         int opcao = -1;
         while (opcao != 0) {
             System.out.println("""
-                    *** Screen Sound Músicas ***
+                    \n*** Screen Sound Músicas ***
                     
                     1- Cadastrar artistas
                     2- Cadastrar músicas
                     3- Listar músicas
                     4- Buscar músicas por artistas
-                    5- Pesquisar dados por artista (com IA)
                     
                     0- Sair
                     """);
@@ -66,53 +66,83 @@ public class Programa {
         System.out.println("Escolha um artista dentre os já cadastrados para ver todas as suas músicas:");
         listarArtistas();
 
-        Artista artista = buscarArtista();
+        Optional<Artista> optionalArtista = buscarArtista();
 
-        List<Musica> musicaList = musicaRepository.findByArtistaNomeIgnoreCase(artista.getNome());
-        musicaList.forEach(System.out::println);
+        if (optionalArtista.isPresent()) {
+            Artista artista = optionalArtista.get();
+
+            List<Musica> musicaList = musicaRepository.findByArtistaNomeIgnoreCase(artista.getNome());
+            musicaList.forEach(System.out::println);
+        } else {
+            System.out.println("O artista digitado não foi encontrado.");
+        }
     }
 
     private void cadastrarArtistas() {
-        System.out.println("Qual é o nome do artista?");
-        String nomeArtista = sc.nextLine();
+        int opcaoArtista = -1;
+        while (opcaoArtista != 2) {
+            System.out.println("Qual é o nome do artista?");
+            String nomeArtista = sc.nextLine();
 
-        System.out.println("""
-                Qual é o tipo do artista? Escolha uma das opções abaixo:
-                1- Solo
-                2- Dupla
-                3- Banda
-                """);
-        int opcaoTipoArtista = sc.nextInt(); sc.nextLine();
-        TipoDoArtista tipoDoArtista = null;
-        switch (opcaoTipoArtista) {
-            case 1:
-                tipoDoArtista = TipoDoArtista.SOLO;
-                break;
-            case 2:
-                tipoDoArtista = TipoDoArtista.DUPLA;
-                break;
-            case 3:
-                tipoDoArtista = TipoDoArtista.BANDA;
-                break;
-            default:
-                System.out.println("Opção inválida");
+            System.out.println("""
+                    Qual é o tipo do artista? Escolha uma das opções abaixo:
+                    1- Solo
+                    2- Dupla
+                    3- Banda
+                    """);
+            int opcaoTipoArtista = sc.nextInt();
+            sc.nextLine();
+            TipoDoArtista tipoDoArtista = null;
+            switch (opcaoTipoArtista) {
+                case 1:
+                    tipoDoArtista = TipoDoArtista.SOLO;
+                    break;
+                case 2:
+                    tipoDoArtista = TipoDoArtista.DUPLA;
+                    break;
+                case 3:
+                    tipoDoArtista = TipoDoArtista.BANDA;
+                    break;
+                default:
+                    System.out.println("Opção inválida");
+            }
+
+            artistaRepository.save(new Artista(nomeArtista, tipoDoArtista));
+            System.out.println("Artista cadastrado com sucesso.\n");
+            System.out.println("""
+                    Deseja cadastrar outro artista?
+                    1- Sim
+                    2- Não""");
+            opcaoArtista = sc.nextInt(); sc.nextLine();
         }
-
-        artistaRepository.save(new Artista(nomeArtista, tipoDoArtista));
-        System.out.println("Artista cadastrado com sucesso.\n");
     }
 
     private void cadastrarMusicas() {
-        System.out.println("Escolha um artista dentre os já cadastrados para adicionar músicas:");
+        System.out.println("Escolha um artista dentre os já cadastrados para adicionar músicas a ele:");
         listarArtistas();
 
-        Artista artista = buscarArtista();
+        Optional<Artista> optionalArtista = buscarArtista();
+        if (optionalArtista.isPresent()) {
+            int opcaoMusica = -1;
+            while (opcaoMusica != 2) {
+                Artista artista = optionalArtista.get();
 
-        System.out.println("\nQual o nome da música que você quer adicionar para " + artista.getNome() + "?");
-        String nomeMusica = sc.nextLine();
+                System.out.println("\nQual o nome da música que você quer adicionar para " + artista.getNome() + "?");
+                String nomeMusica = sc.nextLine();
 
-        musicaRepository.save(new Musica(nomeMusica, artista));
-        System.out.println("Música cadastrada com sucesso.\n");
+                Musica musica = new Musica(nomeMusica, artista);
+                musicaRepository.save(musica);
+                artista.getMusicas().add(musica);
+                System.out.println("Música cadastrada com sucesso.\n");
+                System.out.printf("""
+                    Deseja adicionar outra música para %s?
+                    1- Sim
+                    2- Não\n""", artista.getNome());
+                opcaoMusica = sc.nextInt(); sc.nextLine();
+            }
+        } else {
+            System.out.println("O artista digitado não foi encontrado.");
+        }
     }
 
     private void listarArtistas() {
@@ -121,13 +151,14 @@ public class Programa {
     }
 
     private void listarMusicas() {
-        List<Musica> musicaList = musicaRepository.findAll();
+        List<Musica> musicaList = musicaRepository.OrderByArtistaNome();
         musicaList.forEach(System.out::println);
     }
 
-    private Artista buscarArtista() {
+    private Optional<Artista> buscarArtista() {
         System.out.print("\nEscreva o nome do artista escolhido: ");
         String nomeArtista = sc.nextLine();
         return artistaRepository.findByNomeContainingIgnoreCase(nomeArtista);
     }
+
 }
